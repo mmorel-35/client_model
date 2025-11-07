@@ -1,2 +1,7 @@
 target/
 tmp/
+
+# Bazel build artifacts
+bazel-*
+.bazel-cache/
+.bazelrc.local

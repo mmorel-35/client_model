@@ -1,0 +1,53 @@
+"""
+Prometheus Client Model - Protocol Buffer definitions
+"""
+
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load("@com_google_protobuf//bazel:py_proto_library.bzl", "py_proto_library")
+load("@rules_go//proto:def.bzl", "go_proto_library")
+
+# Main protocol buffer definition for Prometheus metrics
+proto_library(
+    name = "metrics_proto",
+    srcs = ["metrics.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+# C++ library for Prometheus metrics
+cc_proto_library(
+    name = "metrics_cc_proto",
+    visibility = ["//visibility:public"],
+    deps = [":metrics_proto"],
+)
+
+# Python library for Prometheus metrics
+py_proto_library(
+    name = "metrics_py_proto",
+    visibility = ["//visibility:public"],
+    deps = [":metrics_proto"],
+)
+
+# Go library for Prometheus metrics
+go_proto_library(
+    name = "client_go_proto",
+    importpath = "github.com/prometheus/client_model/go",
+    proto = ":metrics_proto",
+    visibility = ["//visibility:public"],
+)
+
+# Alias for backward compatibility with envoy's naming
+alias(
+    name = "client_model",
+    actual = ":metrics_proto",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "client_model_go_proto",
+    actual = ":client_go_proto",
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,78 @@
+name: Bazel CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  bazel-build:
+    name: Bazel Build & Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Bazel
+      uses: bazel-contrib/setup-bazel@0.8.5
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Build all targets
+      run: bazel build //...
+
+    - name: Run tests
+      run: bazel test //... --test_output=errors
+
+    - name: Check for proto changes
+      run: |
+        bazel build //io/prometheus/client:client_go_proto
+        # Verify the proto generated code is up to date
+        if ! git diff --quiet; then
+          echo "Generated files are out of date. Please run 'bazel build //io/prometheus/client:client_go_proto' and commit the changes."
+          git diff
+          exit 1
+        fi
+
+  bazel-bzlmod:
+    name: Bazel Bzlmod Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Bazel
+      uses: bazel-contrib/setup-bazel@0.8.5
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Build with Bzlmod
+      run: bazel build //... --enable_bzlmod
+
+    - name: Test with Bzlmod
+      run: bazel test //... --enable_bzlmod --test_output=errors
+
+  bazelci:
+    name: BazelCI Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate BazelCI config
+      run: |
+        # Download bazelci.py for validation
+        curl -sSL https://raw.githubusercontent.com/bazelbuild/continuous-integration/master/buildkite/bazelci.py -o bazelci.py
+        python3 bazelci.py --print_tasks .bazelci/presubmit.yml
