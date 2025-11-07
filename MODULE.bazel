@@ -6,7 +6,7 @@ module(
     name = "client_model",
     version = "0.6.1",
     compatibility_level = 1,
-    repo_name = "prometheus_client_model",
+    repo_name = "prometheus_metrics_model",
 )
 
 # Core dependencies for protobuf

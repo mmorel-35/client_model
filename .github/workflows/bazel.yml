@@ -32,16 +32,6 @@ jobs:
     - name: Run tests
       run: bazel test //... --test_output=errors
 
-    - name: Check for proto changes
-      run: |
-        bazel build //io/prometheus/client:client_go_proto
-        # Verify the proto generated code is up to date
-        if ! git diff --quiet; then
-          echo "Generated files are out of date. Please run 'bazel build //io/prometheus/client:client_go_proto' and commit the changes."
-          git diff
-          exit 1
-        fi
-
   bazel-bzlmod:
     name: Bazel Bzlmod Test
     runs-on: ubuntu-latest

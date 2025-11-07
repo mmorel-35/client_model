@@ -39,15 +39,31 @@ go_proto_library(
     visibility = ["//visibility:public"],
 )
 
-# Alias for backward compatibility with envoy's naming
+# Envoy compatibility: api_cc_py_proto_library creates a proto_library target
+# named "client_model" that consumers can depend on
 alias(
     name = "client_model",
     actual = ":metrics_proto",
     visibility = ["//visibility:public"],
 )
 
+# Envoy compatibility: Go proto alias
 alias(
     name = "client_model_go_proto",
     actual = ":client_go_proto",
+    visibility = ["//visibility:public"],
+)
+
+# Envoy compatibility: C++ proto library (if consumers need C++ specifically)
+alias(
+    name = "client_model_cc_proto",
+    actual = ":metrics_cc_proto",
+    visibility = ["//visibility:public"],
+)
+
+# Envoy compatibility: Python proto library (if consumers need Python specifically)
+alias(
+    name = "client_model_py_proto",
+    actual = ":metrics_py_proto",
     visibility = ["//visibility:public"],
 )

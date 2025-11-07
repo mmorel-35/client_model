@@ -55,15 +55,76 @@ bazel test //... --test_output=all
 
 ## Integration with Envoy
 
-This repository can be consumed by Envoy using the MODULE.bazel system. The build configuration
-inlines the logic from Envoy's `api/bazel/repositories.bzl` for the prometheus_metrics_model
-dependency.
+This repository is designed for compatibility with [Envoy Proxy](https://github.com/envoyproxy/envoy).
+The Bazel MODULE configuration uses `repo_name = "prometheus_metrics_model"` to match Envoy's 
+expectations from `api/bazel/repositories.bzl`.
 
-Example usage in a consumer's MODULE.bazel:
+### Using with Envoy (Bzlmod)
+
+In your MODULE.bazel:
 
 ```starlark
 bazel_dep(name = "client_model", version = "0.6.1")
 ```
+
+This provides the following targets that are compatible with Envoy's naming:
+
+**Proto library (language-agnostic):**
+- `@client_model//io/prometheus/client:client_model` - Alias to metrics_proto
+- `@client_model//io/prometheus/client:metrics_proto` - Main proto_library
+
+**Language-specific libraries:**
+- `@client_model//io/prometheus/client:client_model_cc_proto` - C++ library (alias)
+- `@client_model//io/prometheus/client:client_model_py_proto` - Python library (alias)
+- `@client_model//io/prometheus/client:client_model_go_proto` - Go library (alias)
+- `@client_model//io/prometheus/client:metrics_cc_proto` - C++ library (direct)
+- `@client_model//io/prometheus/client:metrics_py_proto` - Python library (direct)
+- `@client_model//io/prometheus/client:client_go_proto` - Go library (direct)
+
+**Note:** When using with `@prometheus_metrics_model` repository name (internal to the module),
+the targets remain the same but use the module's repo_name:
+- `@prometheus_metrics_model//io/prometheus/client:client_model`
+- etc.
+
+### Example Usage
+
+**C++ example:**
+```starlark
+cc_binary(
+    name = "my_app",
+    srcs = ["main.cc"],
+    deps = [
+        "@client_model//io/prometheus/client:metrics_cc_proto",
+    ],
+)
+```
+
+**Go example:**
+```starlark
+go_binary(
+    name = "my_app",
+    srcs = ["main.go"],
+    deps = [
+        "@client_model//io/prometheus/client:client_go_proto",
+    ],
+)
+```
+
+### Legacy WORKSPACE Usage
+
+For projects still using WORKSPACE instead of MODULE.bazel:
+
+```starlark
+http_archive(
+    name = "prometheus_metrics_model",
+    sha256 = "...",
+    strip_prefix = "client_model-0.6.1",
+    urls = ["https://github.com/prometheus/client_model/archive/v0.6.1.tar.gz"],
+)
+```
+
+The build file content is already included in this repository, so no additional
+`build_file_content` parameter is needed.
 
 ## Publishing to Bazel Central Registry (BCR)
 
