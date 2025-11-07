@@ -34,24 +34,3 @@ jobs:
 
     - name: Run tests
       run: bazel test //... --test_output=errors
-
-  bazel-bzlmod:
-    name: Bazel Bzlmod Test
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Bazel
-      uses: bazel-contrib/setup-bazel@0.8.5
-      with:
-        bazelisk-cache: true
-        disk-cache: ${{ github.workflow }}
-        repository-cache: true
-
-    - name: Build with Bzlmod
-      run: bazel build //... --enable_bzlmod
-
-    - name: Test with Bzlmod
-      run: bazel test //... --enable_bzlmod --test_output=errors

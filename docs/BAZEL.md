@@ -48,7 +48,6 @@ bazel test //... --test_output=all
 - `//io/prometheus/client:metrics_cc_proto` - C++ library
 - `//io/prometheus/client:metrics_py_proto` - Python library  
 - `//io/prometheus/client:metrics_java_proto` - Java library
-- `//io/prometheus/client:metrics_java_lite_proto` - Java Lite library
 - `//io/prometheus/client:client_go_proto` - Go library
 
 ## Usage
@@ -56,7 +55,7 @@ bazel test //... --test_output=all
 In your MODULE.bazel:
 
 ```starlark
-bazel_dep(name = "client_model", version = "0.6.1")
+bazel_dep(name = "prometheus_client_model", version = "0.6.1")
 ```
 
 **C++ example:**
@@ -65,7 +64,7 @@ cc_binary(
     name = "my_app",
     srcs = ["main.cc"],
     deps = [
-        "@client_model//io/prometheus/client:metrics_cc_proto",
+        "@prometheus_client_model//io/prometheus/client:metrics_cc_proto",
     ],
 )
 ```
@@ -76,7 +75,7 @@ go_binary(
     name = "my_app",
     srcs = ["main.go"],
     deps = [
-        "@client_model//io/prometheus/client:client_go_proto",
+        "@prometheus_client_model//io/prometheus/client:client_go_proto",
     ],
 )
 ```
@@ -87,7 +86,7 @@ java_binary(
     name = "my_app",
     srcs = ["Main.java"],
     deps = [
-        "@client_model//io/prometheus/client:metrics_java_proto",
+        "@prometheus_client_model//io/prometheus/client:metrics_java_proto",
     ],
 )
 ```
@@ -98,7 +97,7 @@ For projects still using WORKSPACE instead of MODULE.bazel:
 
 ```starlark
 http_archive(
-    name = "prometheus_metrics_model",
+    name = "prometheus_client_model",
     sha256 = "...",
     strip_prefix = "client_model-0.6.1",
     urls = ["https://github.com/prometheus/client_model/archive/v0.6.1.tar.gz"],
@@ -114,7 +113,7 @@ This repository uses [publish-to-bcr](https://github.com/bazel-contrib/publish-t
 
 ### Automated Publishing
 
-The repository is configured to automatically publish releases to BCR when a new version tag is pushed:
+The repository is configured with `.bcr/` directory and `.github/workflows/publish.yml` to automatically publish releases to BCR when a new version tag is pushed:
 
 1. **Update the version** in `MODULE.bazel`
 2. **Create and push a tag**:

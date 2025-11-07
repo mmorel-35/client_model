@@ -3,31 +3,21 @@ Prometheus Client Model - Protocol Buffer definitions for Prometheus metrics
 """
 
 module(
-    name = "client_model",
+    name = "prometheus_client_model",
     version = "0.6.1",
     compatibility_level = 1,
-    repo_name = "prometheus_metrics_model",
 )
 
 # Core dependencies for protobuf
 bazel_dep(name = "protobuf", version = "29.0", repo_name = "com_google_protobuf")
-bazel_dep(name = "rules_proto", version = "7.1.0")
-bazel_dep(name = "rules_cc", version = "0.0.17")
 
 # Go support for protobuf
 bazel_dep(name = "rules_go", version = "0.50.1")
 bazel_dep(name = "gazelle", version = "0.39.1")
 
-# Python support for protobuf
-bazel_dep(name = "rules_python", version = "1.6.0")
-
-# Build system utilities
-bazel_dep(name = "bazel_skylib", version = "1.7.1")
-
 # Setup Go SDK and dependencies
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 go_sdk.download(version = "1.23.3")
-use_repo(go_sdk, "go_toolchains")
 
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
 go_deps.from_file(go_mod = "//:go.mod")

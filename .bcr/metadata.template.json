@@ -1,0 +1,15 @@
+{
+  "homepage": "https://github.com/prometheus/client_model",
+  "maintainers": [
+    {
+      "email": "dev@prometheus.io",
+      "github": "prometheus",
+      "name": "Prometheus Developers"
+    }
+  ],
+  "repository": [
+    "github:prometheus/client_model"
+  ],
+  "versions": [],
+  "yanked_versions": {}
+}

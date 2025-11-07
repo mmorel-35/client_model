@@ -1,0 +1,22 @@
+name: Publish to BCR
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Publish to BCR
+        uses: bazel-contrib/publish-to-bcr@v2
+        with:
+          release_files: .bcr/config.yml
+          github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -6,7 +6,6 @@ load("@com_google_protobuf//bazel:proto_library.bzl", "proto_library")
 load("@com_google_protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
 load("@com_google_protobuf//bazel:py_proto_library.bzl", "py_proto_library")
 load("@com_google_protobuf//bazel:java_proto_library.bzl", "java_proto_library")
-load("@com_google_protobuf//bazel:java_lite_proto_library.bzl", "java_lite_proto_library")
 load("@rules_go//proto:def.bzl", "go_proto_library")
 
 # Protocol buffer definition for Prometheus metrics
@@ -36,13 +35,6 @@ py_proto_library(
 # Java library
 java_proto_library(
     name = "metrics_java_proto",
-    visibility = ["//visibility:public"],
-    deps = [":metrics_proto"],
-)
-
-# Java Lite library
-java_lite_proto_library(
-    name = "metrics_java_lite_proto",
     visibility = ["//visibility:public"],
     deps = [":metrics_proto"],
 )
