@@ -1,2 +1,6 @@
 target/
 tmp/
+
+# Bazel build artifacts
+bazel-*
+MODULE.bazel.lock

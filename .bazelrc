@@ -1,0 +1,38 @@
+# Common Bazel configuration options
+
+# Import default settings from .bazelrc.common if it exists
+try-import %workspace%/.bazelrc.common
+
+# Enable Bzlmod for modern dependency management
+common --enable_bzlmod
+
+# Use the new protobuf toolchain resolution
+common --incompatible_enable_proto_toolchain_resolution
+
+# Build configuration
+build --enable_platform_specific_config
+build --announce_rc
+
+# Test configuration
+test --test_output=errors
+test --test_verbose_timeout_warnings
+
+# Performance optimizations
+# Note: These experimental flags improve build performance but may change in future Bazel versions
+build --experimental_parallel_aquery_output
+build --experimental_check_output_files=false
+build --experimental_check_external_repository_files=false
+
+# Platform specific settings
+build:linux --cxxopt=-std=c++17
+build:macos --cxxopt=-std=c++17
+
+# Remote cache configuration (can be overridden locally)
+# build --remote_cache=...
+
+# Development settings
+# Verbose failures for debugging
+build --verbose_failures
+
+# Show test results
+test --test_summary=detailed

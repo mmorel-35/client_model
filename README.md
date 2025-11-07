@@ -41,3 +41,23 @@ format got revived to suppert native histograms in Prometheus. Therefore,
 starting with v2.40.0, the Prometheus server is again capable of ingesting the
 protobuf-based exposition format. Eventually, native histogram support will be
 added in some form to OpenMetrics, too.
+
+## Build Systems
+
+This repository supports multiple build systems:
+
+### Make
+
+```bash
+make build
+```
+
+### Bazel
+
+The repository includes [Bazel](https://bazel.build/) support with [Bzlmod](https://bazel.build/external/overview#bzlmod):
+
+```bash
+bazel build //...
+```
+
+For detailed Bazel usage and BCR publishing instructions, see [docs/BAZEL.md](docs/BAZEL.md).
