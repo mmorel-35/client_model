@@ -10,6 +10,7 @@ module(
 
 # Core dependencies for protobuf
 bazel_dep(name = "protobuf", version = "29.0", repo_name = "com_google_protobuf")
+bazel_dep(name = "rules_proto", version = "7.1.0")
 
 # Go support for protobuf
 bazel_dep(name = "rules_go", version = "0.50.1")
