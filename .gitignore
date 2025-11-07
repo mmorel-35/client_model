@@ -3,6 +3,4 @@ tmp/
 
 # Bazel build artifacts
 bazel-*
-.bazel-cache/
-.bazelrc.local
 MODULE.bazel.lock

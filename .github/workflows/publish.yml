@@ -18,5 +18,4 @@ jobs:
       - name: Publish to BCR
         uses: bazel-contrib/publish-to-bcr@v2
         with:
-          release_files: .bcr/config.yml
           github_token: ${{ secrets.GITHUB_TOKEN }}

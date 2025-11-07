@@ -18,7 +18,7 @@ bazel build //...
 # Build specific targets
 bazel build //io/prometheus/client:metrics_proto
 bazel build //io/prometheus/client:metrics_cc_proto
-bazel build //io/prometheus/client:client_go_proto
+bazel build //io/prometheus/client:metrics_go_proto
 bazel build //io/prometheus/client:metrics_java_proto
 ```
 
@@ -48,7 +48,7 @@ bazel test //... --test_output=all
 - `//io/prometheus/client:metrics_cc_proto` - C++ library
 - `//io/prometheus/client:metrics_py_proto` - Python library  
 - `//io/prometheus/client:metrics_java_proto` - Java library
-- `//io/prometheus/client:client_go_proto` - Go library
+- `//io/prometheus/client:metrics_go_proto` - Go library
 
 ## Usage
 
@@ -75,7 +75,7 @@ go_binary(
     name = "my_app",
     srcs = ["main.go"],
     deps = [
-        "@prometheus_client_model//io/prometheus/client:client_go_proto",
+        "@prometheus_client_model//io/prometheus/client:metrics_go_proto",
     ],
 )
 ```
@@ -88,19 +88,6 @@ java_binary(
     deps = [
         "@prometheus_client_model//io/prometheus/client:metrics_java_proto",
     ],
-)
-```
-
-### WORKSPACE Usage
-
-For projects still using WORKSPACE instead of MODULE.bazel:
-
-```starlark
-http_archive(
-    name = "prometheus_client_model",
-    sha256 = "...",
-    strip_prefix = "client_model-0.6.1",
-    urls = ["https://github.com/prometheus/client_model/archive/v0.6.1.tar.gz"],
 )
 ```
 
@@ -155,15 +142,6 @@ The tool will guide you through the process and create a pull request to the Baz
 The repository includes GitHub Actions workflows:
 - `.github/workflows/bazel.yml` - Runs Bazel build and tests on push/PR
 - Validates builds on Ubuntu and macOS
-- Tests with Bzlmod enabled
-
-### BazelCI
-
-BazelCI configuration is available at `.bazelci/presubmit.yml` and tests:
-- Ubuntu 22.04
-- macOS  
-- Windows
-- Bzlmod compatibility
 
 ## Troubleshooting
 
@@ -173,7 +151,3 @@ BazelCI configuration is available at `.bazelci/presubmit.yml` and tests:
 bazel clean
 bazel build //...
 ```
-
-### Clean Everything (including external dependencies)
-
-```bash
