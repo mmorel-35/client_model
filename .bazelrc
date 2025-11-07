@@ -18,6 +18,7 @@ test --test_output=errors
 test --test_verbose_timeout_warnings
 
 # Performance optimizations
+# Note: These experimental flags improve build performance but may change in future Bazel versions
 build --experimental_parallel_aquery_output
 build --experimental_check_output_files=false
 build --experimental_check_external_repository_files=false

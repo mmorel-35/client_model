@@ -175,8 +175,10 @@ The build file content is already included in this repository, so no additional
    Generate the integrity hash:
    ```bash
    curl -L https://github.com/prometheus/client_model/archive/refs/tags/v0.6.1.tar.gz | \
-     shasum -a 256 | awk '{print "sha256-"$1}'
+     shasum -a 256 | awk '{print $1}'
    ```
+   
+   Then format as `sha256-<hash>` for the source.json file.
 
 5. **Create metadata.json** (if this is the first version)
    
@@ -222,7 +224,7 @@ You can automate BCR publishing by creating a workflow that:
 2. Generates the required BCR files
 3. Creates a pull request to BCR
 
-See `.github/workflows/bcr-publish.yml` for an example (to be created if needed).
+This is typically done manually for now, but automation can be added in the future.
 
 ## CI/CD
 
