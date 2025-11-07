@@ -5,3 +5,4 @@ tmp/
 bazel-*
 .bazel-cache/
 .bazelrc.local
+MODULE.bazel.lock

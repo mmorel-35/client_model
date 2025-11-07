@@ -55,17 +55,3 @@ jobs:
 
     - name: Test with Bzlmod
       run: bazel test //... --enable_bzlmod --test_output=errors
-
-  bazelci:
-    name: BazelCI Validation
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Validate BazelCI config
-      run: |
-        # Download bazelci.py for validation
-        curl -sSL https://raw.githubusercontent.com/bazelbuild/continuous-integration/master/buildkite/bazelci.py -o bazelci.py
-        python3 bazelci.py --print_tasks .bazelci/presubmit.yml

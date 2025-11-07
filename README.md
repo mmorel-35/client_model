@@ -46,20 +46,18 @@ added in some form to OpenMetrics, too.
 
 This repository supports multiple build systems:
 
-### Make (Traditional)
+### Make
 
 ```bash
 make build
 ```
 
-### Bazel (Modern)
+### Bazel
 
-The repository includes full [Bazel](https://bazel.build/) support with [Bzlmod](https://bazel.build/external/overview#bzlmod) for modern dependency management:
+The repository includes [Bazel](https://bazel.build/) support with [Bzlmod](https://bazel.build/external/overview#bzlmod):
 
 ```bash
 bazel build //...
 ```
 
-For detailed Bazel usage, BCR publishing instructions, and CI/CD setup, see [docs/BAZEL.md](docs/BAZEL.md).
-
-The Bazel configuration inlines logic from [Envoy's api/bazel/repositories.bzl](https://github.com/envoyproxy/envoy/blob/main/api/bazel/repositories.bzl) for compatibility with Envoy and other projects using this model.
+For detailed Bazel usage and BCR publishing instructions, see [docs/BAZEL.md](docs/BAZEL.md).

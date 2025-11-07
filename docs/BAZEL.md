@@ -1,6 +1,6 @@
 # Bazel Build System Documentation
 
-This repository uses [Bazel](https://bazel.build/) as its build system with [Bzlmod](https://bazel.build/external/overview#bzlmod) for modern dependency management.
+This repository uses [Bazel](https://bazel.build/) as its build system with [Bzlmod](https://bazel.build/external/overview#bzlmod).
 
 ## Quick Start
 
@@ -19,6 +19,7 @@ bazel build //...
 bazel build //io/prometheus/client:metrics_proto
 bazel build //io/prometheus/client:metrics_cc_proto
 bazel build //io/prometheus/client:client_go_proto
+bazel build //io/prometheus/client:metrics_java_proto
 ```
 
 ### Testing
@@ -46,47 +47,17 @@ bazel test //... --test_output=all
 - `//io/prometheus/client:metrics_proto` - Core proto_library
 - `//io/prometheus/client:metrics_cc_proto` - C++ library
 - `//io/prometheus/client:metrics_py_proto` - Python library  
+- `//io/prometheus/client:metrics_java_proto` - Java library
+- `//io/prometheus/client:metrics_java_lite_proto` - Java Lite library
 - `//io/prometheus/client:client_go_proto` - Go library
 
-### Aliases (for Envoy compatibility)
-
-- `//io/prometheus/client:client_model` - Alias to metrics_proto
-- `//io/prometheus/client:client_model_go_proto` - Alias to client_go_proto
-
-## Integration with Envoy
-
-This repository is designed for compatibility with [Envoy Proxy](https://github.com/envoyproxy/envoy).
-The Bazel MODULE configuration uses `repo_name = "prometheus_metrics_model"` to match Envoy's 
-expectations from `api/bazel/repositories.bzl`.
-
-### Using with Envoy (Bzlmod)
+## Usage
 
 In your MODULE.bazel:
 
 ```starlark
 bazel_dep(name = "client_model", version = "0.6.1")
 ```
-
-This provides the following targets that are compatible with Envoy's naming:
-
-**Proto library (language-agnostic):**
-- `@client_model//io/prometheus/client:client_model` - Alias to metrics_proto
-- `@client_model//io/prometheus/client:metrics_proto` - Main proto_library
-
-**Language-specific libraries:**
-- `@client_model//io/prometheus/client:client_model_cc_proto` - C++ library (alias)
-- `@client_model//io/prometheus/client:client_model_py_proto` - Python library (alias)
-- `@client_model//io/prometheus/client:client_model_go_proto` - Go library (alias)
-- `@client_model//io/prometheus/client:metrics_cc_proto` - C++ library (direct)
-- `@client_model//io/prometheus/client:metrics_py_proto` - Python library (direct)
-- `@client_model//io/prometheus/client:client_go_proto` - Go library (direct)
-
-**Note:** When using with `@prometheus_metrics_model` repository name (internal to the module),
-the targets remain the same but use the module's repo_name:
-- `@prometheus_metrics_model//io/prometheus/client:client_model`
-- etc.
-
-### Example Usage
 
 **C++ example:**
 ```starlark
@@ -110,7 +81,18 @@ go_binary(
 )
 ```
 
-### Legacy WORKSPACE Usage
+**Java example:**
+```starlark
+java_binary(
+    name = "my_app",
+    srcs = ["Main.java"],
+    deps = [
+        "@client_model//io/prometheus/client:metrics_java_proto",
+    ],
+)
+```
+
+### WORKSPACE Usage
 
 For projects still using WORKSPACE instead of MODULE.bazel:
 
@@ -128,103 +110,44 @@ The build file content is already included in this repository, so no additional
 
 ## Publishing to Bazel Central Registry (BCR)
 
-### Prerequisites for BCR Publishing
+This repository uses [publish-to-bcr](https://github.com/bazel-contrib/publish-to-bcr) to automate publishing to the Bazel Central Registry.
 
-1. **Version Tagging**: Create a Git tag following semantic versioning (e.g., `v0.6.1`)
-2. **MODULE.bazel**: Ensure the version in MODULE.bazel matches your release tag
-3. **Release Archive**: The BCR will fetch the source archive from GitHub releases
+### Automated Publishing
 
-### Steps to Publish
+The repository is configured to automatically publish releases to BCR when a new version tag is pushed:
 
-1. **Prepare the Release**
+1. **Update the version** in `MODULE.bazel`
+2. **Create and push a tag**:
    ```bash
-   # Update version in MODULE.bazel
-   # Commit all changes
    git tag v0.6.1
    git push origin v0.6.1
    ```
+3. **The publish-to-bcr action** will automatically:
+   - Create a fork of bazel-central-registry (if needed)
+   - Generate the required BCR files (MODULE.bazel, source.json, metadata.json)
+   - Create a pull request to BCR
+   - Run automated validation checks
 
-2. **Create a Pull Request to BCR**
-   
-   Fork and clone the [Bazel Central Registry](https://github.com/bazelbuild/bazel-central-registry):
-   
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/bazel-central-registry.git
-   cd bazel-central-registry
-   ```
+### Manual Publishing
 
-3. **Create Module Directory**
-   
-   ```bash
-   mkdir -p modules/client_model/0.6.1
-   ```
+If you need to publish manually, you can use the [publish-to-bcr CLI](https://github.com/bazel-contrib/publish-to-bcr):
 
-4. **Create Required Files**
+```bash
+# Install the CLI
+npm install -g @bazel/publish-to-bcr
 
-   Create `modules/client_model/0.6.1/MODULE.bazel` - copy from your repository
-   
-   Create `modules/client_model/0.6.1/source.json`:
-   ```json
-   {
-     "integrity": "sha256-...",
-     "strip_prefix": "client_model-0.6.1",
-     "url": "https://github.com/prometheus/client_model/archive/refs/tags/v0.6.1.tar.gz"
-   }
-   ```
-   
-   Generate the integrity hash:
-   ```bash
-   curl -L https://github.com/prometheus/client_model/archive/refs/tags/v0.6.1.tar.gz | \
-     shasum -a 256 | awk '{print $1}'
-   ```
-   
-   Then format as `sha256-<hash>` for the source.json file.
+# Publish a release
+publish-to-bcr --github=prometheus/client_model --tag=v0.6.1
+```
 
-5. **Create metadata.json** (if this is the first version)
-   
-   Create `modules/client_model/metadata.json`:
-   ```json
-   {
-     "homepage": "https://github.com/prometheus/client_model",
-     "maintainers": [
-       {
-         "email": "dev@prometheus.io",
-         "github": "prometheus",
-         "name": "Prometheus Developers"
-       }
-     ],
-     "versions": ["0.6.1"],
-     "yanked_versions": {}
-   }
-   ```
+The tool will guide you through the process and create a pull request to the Bazel Central Registry.
 
-6. **Submit Pull Request**
-   
-   ```bash
-   git checkout -b add-client-model-0.6.1
-   git add modules/client_model/
-   git commit -m "Add client_model 0.6.1"
-   git push origin add-client-model-0.6.1
-   ```
-   
-   Create a pull request to the bazel-central-registry repository.
+### BCR Requirements
 
-7. **Automated Validation**
-   
-   The BCR has automated checks that will:
-   - Verify the module builds successfully
-   - Check the source archive is valid
-   - Validate the integrity hash
-   - Run tests
-
-### Automated Publishing with GitHub Actions
-
-You can automate BCR publishing by creating a workflow that:
-1. Detects new version tags
-2. Generates the required BCR files
-3. Creates a pull request to BCR
-
-This is typically done manually for now, but automation can be added in the future.
+- Repository must have a `MODULE.bazel` file at the root
+- Version in `MODULE.bazel` must match the git tag (without the 'v' prefix)
+- All Bazel targets must build successfully
+- Tests must pass
 
 ## CI/CD
 
@@ -243,15 +166,6 @@ BazelCI configuration is available at `.bazelci/presubmit.yml` and tests:
 - Windows
 - Bzlmod compatibility
 
-To run BazelCI locally:
-```bash
-# Install bazelci.py
-curl -sSL https://raw.githubusercontent.com/bazelbuild/continuous-integration/master/buildkite/bazelci.py -o bazelci.py
-
-# Run presubmit checks
-python3 bazelci.py --print_tasks .bazelci/presubmit.yml
-```
-
 ## Troubleshooting
 
 ### Clean Build
@@ -264,20 +178,3 @@ bazel build //...
 ### Clean Everything (including external dependencies)
 
 ```bash
-bazel clean --expunge
-```
-
-### Update Dependencies
-
-Dependencies are managed in `MODULE.bazel`. After updating:
-```bash
-bazel sync --only=<dependency_name>
-```
-
-## Additional Resources
-
-- [Bazel Documentation](https://bazel.build/)
-- [Bzlmod Guide](https://bazel.build/external/overview#bzlmod)
-- [Bazel Central Registry](https://registry.bazel.build/)
-- [rules_proto Documentation](https://github.com/bazelbuild/rules_proto)
-- [rules_go Documentation](https://github.com/bazelbuild/rules_go)

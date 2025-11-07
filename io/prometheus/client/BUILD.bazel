@@ -2,12 +2,14 @@
 Prometheus Client Model - Protocol Buffer definitions
 """
 
-load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load("@com_google_protobuf//bazel:proto_library.bzl", "proto_library")
+load("@com_google_protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
 load("@com_google_protobuf//bazel:py_proto_library.bzl", "py_proto_library")
+load("@com_google_protobuf//bazel:java_proto_library.bzl", "java_proto_library")
+load("@com_google_protobuf//bazel:java_lite_proto_library.bzl", "java_lite_proto_library")
 load("@rules_go//proto:def.bzl", "go_proto_library")
 
-# Main protocol buffer definition for Prometheus metrics
+# Protocol buffer definition for Prometheus metrics
 proto_library(
     name = "metrics_proto",
     srcs = ["metrics.proto"],
@@ -17,53 +19,38 @@ proto_library(
     ],
 )
 
-# C++ library for Prometheus metrics
+# C++ library
 cc_proto_library(
     name = "metrics_cc_proto",
     visibility = ["//visibility:public"],
     deps = [":metrics_proto"],
 )
 
-# Python library for Prometheus metrics
+# Python library
 py_proto_library(
     name = "metrics_py_proto",
     visibility = ["//visibility:public"],
     deps = [":metrics_proto"],
 )
 
-# Go library for Prometheus metrics
+# Java library
+java_proto_library(
+    name = "metrics_java_proto",
+    visibility = ["//visibility:public"],
+    deps = [":metrics_proto"],
+)
+
+# Java Lite library
+java_lite_proto_library(
+    name = "metrics_java_lite_proto",
+    visibility = ["//visibility:public"],
+    deps = [":metrics_proto"],
+)
+
+# Go library
 go_proto_library(
     name = "client_go_proto",
     importpath = "github.com/prometheus/client_model/go",
     proto = ":metrics_proto",
-    visibility = ["//visibility:public"],
-)
-
-# Envoy compatibility: api_cc_py_proto_library creates a proto_library target
-# named "client_model" that consumers can depend on
-alias(
-    name = "client_model",
-    actual = ":metrics_proto",
-    visibility = ["//visibility:public"],
-)
-
-# Envoy compatibility: Go proto alias
-alias(
-    name = "client_model_go_proto",
-    actual = ":client_go_proto",
-    visibility = ["//visibility:public"],
-)
-
-# Envoy compatibility: C++ proto library (if consumers need C++ specifically)
-alias(
-    name = "client_model_cc_proto",
-    actual = ":metrics_cc_proto",
-    visibility = ["//visibility:public"],
-)
-
-# Envoy compatibility: Python proto library (if consumers need Python specifically)
-alias(
-    name = "client_model_py_proto",
-    actual = ":metrics_py_proto",
     visibility = ["//visibility:public"],
 )
